@@ -21,9 +21,15 @@
 				<ul>
 					<li data-logged-out><a href="#" data-signup-button>Sign Up</a></li>
 					<li data-logged-out><a href="#" data-login-button>Log In</a></li>
-					<li data-logged-in class="hidden"><a href="#" id="dashboard-button-nav">Dashboard</a></li>
-					<li data-logged-in class="hidden"><a href="#" id="account-button-nav">Account Settings</a></li>
-					<li data-logged-in class="hidden"><a href="#" id="logout-button-nav">Log Out</a></li>
+					<li data-logged-in class="hidden">
+						<a href="#" id="dashboard-button-nav">Dashboard</a>
+					</li>
+					<li data-logged-in class="hidden">
+						<a href="#" id="account-button-nav">Account Settings</a>
+					</li>
+					<li data-logged-in class="hidden">
+						<a href="#" id="logout-button-nav">Log Out</a>
+					</li>
 				</ul>
 			</nav>
 		</header>
@@ -60,7 +66,11 @@
 					</div>
 					<div class="input-group">
 						<label>Email</label>
-						<input type="email" name="email" placeholder="email@example.com" />
+						<input
+							type="email"
+							name="email"
+							placeholder="email@example.com"
+						/>
 					</div>
 					<div class="input-group">
 						<label>Password</label>
@@ -72,7 +82,7 @@
 					</div>
 					<div class="input-group">
 						<label>I agree to the Terms of Use</label>
-						<input type="checkbox" name="tosAgreement" value="agree" />
+						<input type="checkbox" name="tosAgreement" />
 					</div>
 					<button type="submit" class="form-button">Sign Un</button>
 				</form>
@@ -84,7 +94,11 @@
 					<h4>Welcome back!</h4>
 					<div class="input-group">
 						<label>Email</label>
-						<input type="email" name="email" placeholder="email@example.com" />
+						<input
+							type="email"
+							name="email"
+							placeholder="email@example.com"
+						/>
 					</div>
 					<div class="input-group">
 						<label>Password</label>

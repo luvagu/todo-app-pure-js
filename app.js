@@ -1,3 +1,8 @@
+// Constants
+let _CURRENT_USER
+const LS_SESSION_NAME = 'todos.sessionToken'
+const _SESSION = JSON.parse(localStorage.getItem(LS_SESSION_NAME)) || null
+
 // Selectors
 const navLiElems =  document.querySelectorAll('nav ul li')
 const loggedOutNavLinks = document.querySelectorAll('[data-logged-out]')
@@ -53,11 +58,61 @@ logInBtns.forEach(button => {
 })
 
 // LogOut button
+logOutBtnNav.addEventListener('click', (e) => {
+    e.preventDefault()
 
+    // Log the user out
+    logUserOut()
+})
+
+// SignUp form
+signUpForm.addEventListener('submit', formsHandler)
+
+// logInForm form
+logInForm.addEventListener('submit', formsHandler)
+
+// accountForm form
+accountForm.addEventListener('submit', formsHandler)
+
+// Forms handler
+function formsHandler(e) {
+    // Prevent the form from submiting
+    e.preventDefault()
+
+    // Turn the inputs into a payload
+    const payload = {}
+
+    // Define the inputs object
+    const inputs = e.target.elements
+
+    // Start bulding the payload
+    for (let i = 0; i < inputs.length; i++) {
+        const input = inputs[i];
+        if (input.type !== 'submit') {
+            // Build the payload
+            payload[input.name] = input.type == 'checkbox' ? input.checked : input.value
+        }
+    }
+
+    // @TODO
+    // Validate payload
+    // validatePayload(payload)
+
+    console.log('payload', payload)
+}
+
+function validatePayload(payload) {
+    payload = typeof(payload) == 'object' && payload !== null ? payload : false
+
+    if (payload)
+}
 
 function activeNavBtn(e) {
     // Reset element current 'active' class 
     navLiElems.forEach(li => li.classList.remove('active'))
+
+    // Return if e isn't defined
+    if (e == undefined) return
 
     // Add class 'active' to the current elem
     if (e.parentElement.tagName == 'LI') {
@@ -132,15 +187,32 @@ function logUserOut() {
 
     // Hide all other sections as well
     hideAllSections()
+
+    // Show the showHomeSection
+    showHomeSection()
+
+    // Reset Nav 'active' class
+    activeNavBtn(undefined)
 }
 
+function sessionChecker() {
+    // @TODO
+    // Check for an active session, if so redirect to the dashboard and load their todos, otherwise log the user out if there is an error
 
+    // Laod the user's saved todo's on active session
+    // loadUserToDos()
+}
 
-
-
+function loadUserToDos() {
+    // @TODO
+}
+ 
 function appInit() {
     // @TODO
-    // Check if the user is logged in and redirect, otherwise log the user out
+
+    // Check if there's an active session
+    // sessionChecker()
+
     console.log('All app scripts loaded succesfuly!')
 }
 
