@@ -99,6 +99,10 @@ section {
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
+	background-image: url('todo-bg.png');
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
 }
 
 section.home p {
@@ -136,7 +140,7 @@ section.home h2 > a:hover {
 }
 
 section.forms form {
-    background-color: hsla(201, 100%, 6%, 0.6);
+    background-color: hsla(201, 100%, 6%, 0.7);
     padding: 50px 30px;
     min-width: 400px;
     width: 50%;
