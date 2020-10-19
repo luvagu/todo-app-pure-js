@@ -17,93 +17,119 @@
 	<body>
 		<header>
 			<nav>
-        <h1>To-Do's</h1>
+				<h1>To-Do's</h1>
 				<ul>
-					<li data-logged-out><a href="#">Sign Up</a></li>
-					<li data-logged-out><a href="#">Log In</a></li>
-					<li data-logged-in class="hidden"><a href="#">Dashboard</a></li>
-					<li data-logged-in class="hidden"><a href="#">Account Settings</a></li>
-					<li data-logged-in class="hidden"><a href="#">Log Out</a></li>
+					<li data-logged-out><a href="#" id="signup-button-nav">Sign Up</a></li>
+					<li data-logged-out><a href="#" id="login-button-nav">Log In</a></li>
+					<li data-logged-in class="hidden active"><a href="#" id="dashboard-button-nav">Dashboard</a></li>
+					<li data-logged-in class="hidden"><a href="#" id="account-button-nav">Account Settings</a></li>
+					<li data-logged-in class="hidden"><a href="#" id="logout-button-nav">Log Out</a></li>
 				</ul>
 			</nav>
 		</header>
 
 		<main>
-      <section class="home" data-logged-out>
-        <p>To-Do's lets you easily create and save to-do lists/tasks that you need doing on a daily basis</p>
-        <div class="links">
-          <h2><small>New at To-Do's?</small><a href="#" id="signup-button-home">Sign Up</a></h2>
-          <h2><small>Got an account?</small><a href="#" id="login-button-home">Log In</a></h2>
-        </div>
-      </section>
+			<section class="home" data-logged-out>
+				<p>
+					To-Do's lets you easily create and save to-do lists/tasks that you
+					need doing on a daily basis
+				</p>
+				<div class="links">
+					<h2>
+						<small>New at To-Do's?</small
+						><a href="#" id="signup-button-home">Sign Up</a>
+					</h2>
+					<h2>
+						<small>Got an account?</small
+						><a href="#" id="login-button-home">Log In</a>
+					</h2>
+				</div>
+			</section>
 
-      <section class="forms hidden" id="signup-form-section">
-        <form id="signup-form">
-          <h2>Sign Up</h2>
-          <h4>Create an account in just a few seconds</h4>
-          <div class="input-group">
-            <label>First Name</label>
-            <input type="text" name="firstName" placeholder="John">
-          </div>
-          <div class="input-group">
-            <label>Last Name</label>
-            <input type="text" name="lastName" placeholder="Smith">
-          </div>
-          <div class="input-group">
-            <label>Email</label>
-            <input type="email" name="email" placeholder="email@example.com">
-          </div>
-          <div class="input-group">
-            <label>Password</label>
-            <input type="password" name="password" placeholder="******************">
-          </div>
-          <div class="input-group">
-            <label>I agree to the Terms of Use</label>
-            <input type="checkbox" name="tosAgreement" value="agree">
-          </div>
-          <button type="submit" class="form-button">Sign Un</button>
-        </form>
-      </section>
+			<section class="forms hidden" id="signup-form-section">
+				<form id="signup-form">
+					<h2>Sign Up</h2>
+					<h4>Create an account in just a few seconds</h4>
+					<div class="input-group">
+						<label>First Name</label>
+						<input type="text" name="firstName" placeholder="John" />
+					</div>
+					<div class="input-group">
+						<label>Last Name</label>
+						<input type="text" name="lastName" placeholder="Smith" />
+					</div>
+					<div class="input-group">
+						<label>Email</label>
+						<input type="email" name="email" placeholder="email@example.com" />
+					</div>
+					<div class="input-group">
+						<label>Password</label>
+						<input
+							type="password"
+							name="password"
+							placeholder="******************"
+						/>
+					</div>
+					<div class="input-group">
+						<label>I agree to the Terms of Use</label>
+						<input type="checkbox" name="tosAgreement" value="agree" />
+					</div>
+					<button type="submit" class="form-button">Sign Un</button>
+				</form>
+			</section>
 
-      <section class="forms hidden" id="login-form-section">
-        <form id="login-form">
-          <h2>Log In</h2>
-          <h4>Welcome back!</h4>
-          <div class="input-group">
-            <label>Email</label>
-            <input type="email" name="email" placeholder="email@example.com">
-          </div>
-          <div class="input-group">
-            <label>Password</label>
-            <input type="password" name="password" placeholder="******************">
-          </div>
-          <button type="submit" class="form-button">Log In</button>
-        </form>
-      </section>
+			<section class="forms hidden" id="login-form-section">
+				<form id="login-form">
+					<h2>Log In</h2>
+					<h4>Welcome back!</h4>
+					<div class="input-group">
+						<label>Email</label>
+						<input type="email" name="email" placeholder="email@example.com" />
+					</div>
+					<div class="input-group">
+						<label>Password</label>
+						<input
+							type="password"
+							name="password"
+							placeholder="******************"
+						/>
+					</div>
+					<button type="submit" class="form-button">Log In</button>
+				</form>
+			</section>
 
-      <section class="forms hidden" id="account-form-section">
-        <form id="account-form">
-          <h2>Account Settings</h2>
-          <h4>Edit your account details</h4>
-          <div class="input-group">
-            <label>Email</label>
-            <input type="email" name="email" value="email@example.com" disabled>
-          </div>
-          <div class="input-group">
-            <label>First Name</label>
-            <input type="text" name="firstName" placeholder="John">
-          </div>
-          <div class="input-group">
-            <label>Last Name</label>
-            <input type="text" name="lastName" placeholder="Smith">
-          </div>
-          <div class="input-group">
-            <label>Choose a New Password</label>
-            <input type="password" name="password" placeholder="******************">
-          </div>
-          <button type="submit" class="form-button">Update</button>
-        </form>
-      </section>
+			<section class="forms hidden" id="account-form-section">
+				<form id="account-form">
+					<h2>Account Settings</h2>
+					<h4>Edit your account details</h4>
+					<div class="input-group">
+						<label>Email</label>
+						<input
+							type="email"
+							name="email"
+							value="email@example.com"
+							disabled
+						/>
+					</div>
+					<div class="input-group">
+						<label>First Name</label>
+						<input type="text" name="firstName" placeholder="John" />
+					</div>
+					<div class="input-group">
+						<label>Last Name</label>
+						<input type="text" name="lastName" placeholder="Smith" />
+					</div>
+					<div class="input-group">
+						<label>Choose a New Password</label>
+						<input
+							type="password"
+							name="password"
+							placeholder="******************"
+						/>
+					</div>
+					<button type="submit" class="form-button">Update</button>
+				</form>
+			</section>
 
 			<section class="dashboard hidden" id="dashboard-section">
 				<div class="all-tasks">

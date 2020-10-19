@@ -85,6 +85,14 @@ nav a:hover {
 	color: var(--clr-linkHover);
 }
 
+nav li.active {
+	background-color: var(--clr-primary);
+}
+
+nav li.active a {
+	color: var(--clr-light);
+}
+
 section {
 	min-height: 100vh;
 	display: flex;
