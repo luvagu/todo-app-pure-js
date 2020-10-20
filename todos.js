@@ -94,7 +94,7 @@ function renderTodos() {
         todosListDisplayContainer.style.display = 'none'
     } else {
         todosListDisplayContainer.style.display = ''
-        todosListTitle.innerText = selectedTodoList.name
+        todosListTitle.innerText = selectedTodoList.name !== undefined ? selectedTodoList.name : ''
         renderTodoTasksCount(selectedTodoList)
         clearElement(tasksContainer)
         renderTodoTasks(selectedTodoList)

@@ -417,6 +417,19 @@ function logUserOut() {
 function sessionChecker() {
     // @TODO
     // Check for an active session, if so redirect to the dashboard and load their todos, otherwise log the user out if there is an error
+    if (_SESSION !== null && _SESSION.user !== undefined) {
+        // Set the current user
+        _CURRENT_USER = _SESSION.user
+        
+        // Log the user in
+        logUserIn()
+
+        // @TODO - remove log
+        console.log('A ssession was found')
+    } else {
+        showHomeSection()
+        console.log('No session found')
+    }
 
     // Laod the user's saved todo's on active session
     // loadUserToDos()
@@ -430,7 +443,7 @@ function appInit() {
     // @TODO
 
     // Check if there's an active session
-    // sessionChecker()
+    sessionChecker()
 
     console.log('All app scripts loaded succesfuly!')
 }
