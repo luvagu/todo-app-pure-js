@@ -2,6 +2,8 @@
 let _CURRENT_USER
 const LS_SESSION_NAME = 'todos.sessionToken'
 const LS_USERS_PREFIX = 'todos.user_'
+const LS_USER_TODO_LISTS = 'todoLists'
+const LS_USER_TODO_SELECTED_LIST_ID = 'selectedListId'
 const _SESSION = JSON.parse(localStorage.getItem(LS_SESSION_NAME)) || null
 
 // Selectors
@@ -84,6 +86,17 @@ dashboardBtnNav.addEventListener('click', (e) => {
 accountBtnNav.addEventListener('click', (e) => {
     e.preventDefault()
 
+    // Hide messages if previously shown
+    document.querySelector(`#account-form > #errMsg`).classList.add('hidden')
+    document.querySelector(`#account-form > #successMsg`).classList.add('hidden')
+
+    // @TODO - preload the account form with the user's details
+    // Get the user object and load data accordingly
+    const user = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + _CURRENT_USER)) || null
+    document.querySelector('#account-form #email').value = user.email
+    document.querySelector('#account-form #firstName').value = user.firstName
+    document.querySelector('#account-form #lastName').value = user.lastName
+
     // Hide all sections
     hideAllSections()
 
@@ -111,6 +124,14 @@ function formsHandler(e) {
     // Get the form ID
     const formId = e.target.id
 
+    // Select the forms error and account susccess elements
+    const errMsg = document.querySelector(`#${formId} > #errMsg`)
+    const successMsg = document.querySelector(`#account-form > #successMsg`)
+
+    // Hide them by default
+    errMsg.classList.add('hidden')
+    successMsg.classList.add('hidden')
+
     // Turn the inputs into a payload
     const payload = {}
 
@@ -130,6 +151,8 @@ function formsHandler(e) {
     // Validate payload & throw err accordingly
     if (!validatePayload(payload, formId)) {
         // @TODO - Throw error message to user
+        errMsg.classList.remove('hidden')
+        errMsg.innerText = 'Missing or invalid field(s) supplied' 
         console.log(formId, 'Missing or invalid field(s) supplied')
         return
     }
@@ -137,10 +160,22 @@ function formsHandler(e) {
     // Assign the current user
     _CURRENT_USER = payload.email
 
-    // Sign Up Form: Check if the user is unique
-    if (formId == 'signup-form' && isUserUnique(_CURRENT_USER)) {
+    // Sign Up Form 
+    if (formId == 'signup-form') {
+
+        // Check if the user is unique
+        if (!isUserUnique(_CURRENT_USER)) {
+            errMsg.classList.remove('hidden')
+            errMsg.innerText = 'A user with that email address already exists'
+            return
+        }
+
         // Hash the user's password
         payload.password = hashedPassword(payload.password)
+
+        // Create the user's todos defaults
+        payload.todoLists = []
+        payload.selectedListId = null
 
         // Store the payload
         localStorage.setItem(LS_USERS_PREFIX + _CURRENT_USER, JSON.stringify(payload))
@@ -190,14 +225,47 @@ function formsHandler(e) {
             // TODO - remove log
             console.log('login-form >>>', 'All good')
         } else {
-
             // TODO - remove log
             console.log('login-form >>>', 'Incorrect password or the user may not exists')
+            errMsg.classList.remove('hidden')
+            errMsg.innerText = 'Incorrect email and/or password' 
+            return
         }
     }
 
-    // @TODO - Reset the form
-    e.target.reset()
+    // Account Form 
+    if (formId == 'account-form') {
+
+        // Get the user object
+        const userData = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + _CURRENT_USER)) || null
+
+        // Update the user accordingly
+        userData.firstName = payload.firstName
+        userData.lastName = payload.lastName
+
+        // Hash the user's password if a new one was supplied (or keep it unchanged)
+        if (payload.password !== '') {
+            userData.password = hashedPassword(payload.password)
+        }
+
+        // Store the update
+        localStorage.setItem(LS_USERS_PREFIX + _CURRENT_USER, JSON.stringify(userData))
+
+        // Show a success message
+        successMsg.classList.remove('hidden')
+        successMsg.innerText = 'Update successful'
+
+        // Reset the password field
+        document.querySelector('#account-form #password').value = ''
+
+        // TODO - remove log
+        console.log('account-form >>>', 'All good')
+    }
+
+    // @TODO - Reset SignUp and Login forms specifically
+    signUpForm.reset()
+    logInForm.reset()
+    errMsg.classList.add('hidden')
 }
 
 function validatePayload(payload, formId) {
@@ -224,7 +292,7 @@ function validatePayload(payload, formId) {
         return (typeof(payload['firstName']) == 'string' && payload['firstName'].length > 0) && 
             (typeof(payload['lastName']) == 'string' && payload['lastName'].length > 0) && 
             (typeof(payload['email']) == 'string' && validateEmail(payload['email'])) && 
-            (typeof(payload['password']) == 'string' && payload['password'].length >= 4)
+            (typeof(payload['password']) == 'string' && (payload['password'] == '' || payload['password'].length >= 4))
     } 
 
     // Default to false
@@ -245,15 +313,7 @@ function validateEmail(email) {
 }
 
 function isUserUnique(user) {
-    if (localStorage[LS_USERS_PREFIX + user] == undefined) {
-        // @TODO - habdle error & remove log
-        console.log('signup-form >>>', 'Success: user is unique')
-        return true
-    }
-
-    // @TODO - habdle error & remove log
-    console.log('signup-form >>>', 'Error: A user with that email address already exists')
-    return false
+    return localStorage[LS_USERS_PREFIX + user] == undefined
 } 
 
 function hashedPassword(password) {
@@ -332,20 +392,26 @@ function logUserIn() {
 
     // Show the dashboard
     showDashboardSection()
+
+    // @TODO
+    // loadUserToDos
 }
 
 function logUserOut() {
     loggedOutNavLinks.forEach(section => section.classList.remove('hidden'))
     loggedInNavLinks.forEach(section => section.classList.add('hidden'))
 
-    // Hide all other sections as well
+    // Hide all sections
     hideAllSections()
 
-    // Show the showHomeSection
+    // Show the home section
     showHomeSection()
 
     // Reset Nav 'active' class
     activeNavBtn(undefined)
+
+    // Delete the current session token
+    localStorage.removeItem(LS_SESSION_NAME)
 }
 
 function sessionChecker() {

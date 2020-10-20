@@ -4,6 +4,8 @@
 	--clr-dark: rgb(51, 51, 51);
 	--clr-warning: rgb(99, 36, 36);
 	--clr-linkHover: rgb(255, 140, 0);
+	--clr-error: rgb(255, 0, 0);
+	--clr-success: rgb(4, 175, 4);
 }
 
 *,
@@ -163,6 +165,22 @@ section.forms form > h4 {
     margin-bottom: 40px;
     font-size: 1.5em;
     font-weight: normal;
+}
+
+form > .error, form > .success {
+	text-align: center;
+    margin: 0;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+	font-weight: normal;
+}
+
+form > .error {
+	color: var(--clr-error);
+}
+
+form > .success {
+	color: var(--clr-success);
 }
 
 .input-group {

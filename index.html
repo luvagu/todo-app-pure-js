@@ -56,6 +56,7 @@
 				<form id="signup-form">
 					<h2>Sign Up</h2>
 					<h4>Create an account in just a few seconds</h4>
+					<div class="error hidden" id="errMsg"></div>
 					<div class="input-group">
 						<label>First Name</label>
 						<input type="text" name="firstName" placeholder="John" />
@@ -92,6 +93,7 @@
 				<form id="login-form">
 					<h2>Log In</h2>
 					<h4>Welcome back!</h4>
+					<div class="error hidden" id="errMsg"></div>
 					<div class="input-group">
 						<label>Email</label>
 						<input
@@ -116,29 +118,32 @@
 				<form id="account-form">
 					<h2>Account Settings</h2>
 					<h4>Edit your account details</h4>
+					<div class="error hidden" id="errMsg"></div>
+					<div class="success hidden" id="successMsg"></div>
 					<div class="input-group">
 						<label>Email</label>
 						<input
+							id="email"
 							type="email"
 							name="email"
-							value="email@example.com"
 							disabled
 						/>
 					</div>
 					<div class="input-group">
 						<label>First Name</label>
-						<input type="text" name="firstName" placeholder="John" />
+						<input id="firstName" type="text" name="firstName" placeholder="John" />
 					</div>
 					<div class="input-group">
 						<label>Last Name</label>
-						<input type="text" name="lastName" placeholder="Smith" />
+						<input id="lastName" type="text" name="lastName" placeholder="Smith" />
 					</div>
 					<div class="input-group">
 						<label>Choose a New Password (min 4 chars)</label>
 						<input
+							id="password"
 							type="password"
 							name="password"
-							placeholder="******************"
+							placeholder="or leave blank to keep the same"
 						/>
 					</div>
 					<button type="submit" class="form-button">Update</button>
