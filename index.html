@@ -150,54 +150,56 @@
 			</section>
 
 			<section class="dashboard hidden" id="dashboard-section">
-				<div class="all-tasks">
-					<h2 class="task-list-title">My lists</h2>
-					<ul class="task-list" data-todos></ul>
+				<div class="todos-grid">
+					<div class="all-tasks">
+						<h2 class="task-list-title">My lists</h2>
+						<ul class="task-list" data-todos></ul>
 
-					<form action="" data-new-todo-form>
-						<input
-							type="text"
-							class="new list"
-							data-new-todo-input
-							placeholder="new list name"
-							aria-label="new list name"
-						/>
-						<button class="btn create" aria-label="create new list">+</button>
-					</form>
-				</div>
-
-				<div class="todo-list" data-todo-display-container>
-					<div class="todo-header">
-						<h2 class="list-title" data-todo-title></h2>
-						<p class="task-count" data-todo-count></p>
+						<form action="" data-new-todo-form>
+							<input
+								type="text"
+								class="new list"
+								data-new-todo-input
+								placeholder="new list name"
+								aria-label="new list name"
+							/>
+							<button class="btn create" aria-label="create new list">+</button>
+						</form>
 					</div>
 
-					<div class="todo-body">
-						<div class="tasks" data-tasks></div>
-
-						<div class="new-task-creator">
-							<form action="" data-new-task-form>
-								<input
-									type="text"
-									data-new-task-input
-									class="new task"
-									placeholder="new task name"
-									aria-label="new task name"
-								/>
-								<button class="btn create" aria-label="create new task">
-									+
-								</button>
-							</form>
+					<div class="todo-list" data-todo-display-container>
+						<div class="todo-header">
+							<h2 class="list-title" data-todo-title></h2>
+							<p class="task-count" data-todo-count></p>
 						</div>
-					</div>
 
-					<div class="delete-stuff">
-						<button class="btn delete" data-clear-complete-tasks-button>
-							Clear completed tasks
-						</button>
-						<button class="btn delete" data-delete-todo-button>
-							Delete list
-						</button>
+						<div class="todo-body">
+							<div class="tasks" data-tasks></div>
+
+							<div class="new-task-creator">
+								<form action="" data-new-task-form>
+									<input
+										type="text"
+										data-new-task-input
+										class="new task"
+										placeholder="new task name"
+										aria-label="new task name"
+									/>
+									<button class="btn create" aria-label="create new task">
+										+
+									</button>
+								</form>
+							</div>
+						</div>
+
+						<div class="delete-stuff">
+							<button class="btn delete" data-clear-complete-tasks-button>
+								Clear completed tasks
+							</button>
+							<button class="btn delete" data-delete-todo-button>
+								Delete list
+							</button>
+						</div>
 					</div>
 				</div>
 			</section>

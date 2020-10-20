@@ -21,16 +21,6 @@ body {
 	font-family: 'Work Sans', sans-serif;
 	background-color: var(--clr-primary);
 	color: var(--clr-light);
-	/* padding-top: 60px; */
-	/* font-weight: 300;
-	font-size: 1.5rem;
-	
-	display: grid;
-	grid: 
-		'header header header header' auto 
-		'...... lists  active ......' auto/1fr 
-		minmax(100px, 300px) 
-		minmax(250px, 500px) 1fr; */
 }
 
 .hidden {
@@ -39,11 +29,11 @@ body {
 
 header {
 	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-	position: fixed;
+	position: sticky;
 	top: 0;
 	left: 0;
 	background-color: rgba(255, 255, 255, 1);
-	width: 100vw;
+	/* width: 100vw; */
 	z-index: 99;
 }
 
@@ -96,20 +86,24 @@ nav li.active a {
 }
 
 section {
-	min-height: 100vh;
+	min-height: 85vh;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	flex-direction: column;
 	background-image: url('todo-bg.png');
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: cover;
 }
 
+section.home {
+	flex-direction: column;
+}
+
 section.home p {
 	font-size: 2rem;
 	text-align: center;
+	padding: 0 50px;
 	margin-bottom: 5rem;
 }
 
@@ -252,14 +246,19 @@ form > .success {
 
 /* To-Do's Styles */
 
-.title {
-	grid-area: header;
-	text-align: center;
-	font-size: calc(7vw + 2rem);
-	font-weight: 900;
-	color: rgba(0, 0, 0, 0.1);
-	letter-spacing: 2px;
-	margin: -0.3em 0 0.5em;
+section.dashboard {
+	align-items: flex-start;
+	padding: 3.5em 1em 5em;
+	font-weight: 300;
+  	font-size: 1.5rem;
+}
+
+.todos-grid {
+	display: grid;
+	grid: 
+		'...... lists  active ......' auto/1fr 
+		minmax(100px, 300px) 
+		minmax(250px, 500px) 1fr;
 }
 
 .all-tasks {

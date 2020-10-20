@@ -1,6 +1,8 @@
 // CONSTANTS
 let CURRENT_USER = ''
 let USER_OBJECT = {}
+let USER_TODOS = []
+let SELECTED_TODO_LIST_ID = null
 const LS_SESSION_NAME = 'todos.sessionToken'
 const LS_USERS_PREFIX = 'todos.user_'
 const LS_USER_TODO_LISTS = 'todoLists'
@@ -130,7 +132,8 @@ logInForm.addEventListener('submit', formsHandler)
 // accountForm form
 accountForm.addEventListener('submit', formsHandler)
 
-// Forms handler
+// --> FORMS LOGIC
+
 function formsHandler(e) {
     // Prevent the form from submiting
     e.preventDefault()
@@ -194,6 +197,11 @@ function formsHandler(e) {
         // Store the payload
         localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(payload))
 
+        // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
+        USER_OBJECT = payload
+        USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS]
+        SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID]
+
         // Create a session
         const sessionData = {
             id: Date.now(),
@@ -204,9 +212,6 @@ function formsHandler(e) {
         // Log the user in and redirect
         logUserIn()
 
-        // Activate nav dashboard link
-        activeNavBtn('dashboard')
-
         // TODO - remove log
         console.log('signup-form >>>', 'All good')
     }
@@ -214,11 +219,13 @@ function formsHandler(e) {
     // Log In Form
     if (formId == 'login-form') {
 
-        // Get the user object
-        const user = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) || null
+        // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
+        USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
+        USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
+        SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
 
         // Get the hashed password from the user's object or default to an empty string
-        const hash = typeof(user) == 'object' && user !== null ? user.password : ''
+        const hash = USER_OBJECT.password !== undefined ? USER_OBJECT.password : ''
 
         // Verify the user's password and continue or throw an error
         if (verifyPassword(payload.password, hash)) {
@@ -232,9 +239,6 @@ function formsHandler(e) {
 
             // Log the user in and redirect
             logUserIn()
-
-            // Activate nav dashboard link
-            activeNavBtn('dashboard')
 
             // TODO - remove log
             console.log('login-form >>>', 'All good')
@@ -250,20 +254,17 @@ function formsHandler(e) {
     // Account Form 
     if (formId == 'account-form') {
 
-        // Get the user object
-        const userData = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) || null
-
         // Update the user accordingly
-        userData.firstName = payload.firstName
-        userData.lastName = payload.lastName
+        USER_OBJECT.firstName = payload.firstName
+        USER_OBJECT.lastName = payload.lastName
 
         // Hash the user's password if a new one was supplied (or keep it unchanged)
         if (payload.password !== '') {
-            userData.password = hashedPassword(payload.password)
+            USER_OBJECT.password = hashedPassword(payload.password)
         }
 
         // Store the update
-        localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(userData))
+        localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
 
         // Show a success message
         successMsg.classList.remove('hidden')
@@ -407,8 +408,11 @@ function logUserIn() {
     // Show the dashboard
     showDashboardSection()
 
-    // @TODO
-    // loadUserToDos
+    // Activate Nav dashboard button
+    activeNavBtn('dashboard')
+
+    // Render User's todos
+    renderTodos()
 }
 
 function logUserOut() {
@@ -426,23 +430,25 @@ function logUserOut() {
 
     // Delete the current session token
     localStorage.removeItem(LS_SESSION_NAME)
+
+    // Reset the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID to their defaults
+    USER_OBJECT = {}
+    USER_TODOS = []
+    SELECTED_TODO_LIST_ID = null
 }
 
 // --> TODOS LOGIC
 
-let todos = USER_OBJECT.LS_USER_TODO_LISTS || []
-let selectedTodoListId = USER_OBJECT.LS_USER_SELECTED_LIST_ID
-
 todosContainer.addEventListener('click', e => {
     if (e.target.tagName.toLowerCase() === 'li') {
-        selectedTodoListId = e.target.dataset.todoId
+        SELECTED_TODO_LIST_ID = e.target.dataset.todoId
         saveAndRender()
     }
 })
 
 tasksContainer.addEventListener('click', e => {
     if (e.target.tagName.toLowerCase() === 'input') {
-        const selectedTodo = todos.find(todo => todo.id === selectedTodoListId)
+        const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
         const selectedTask = selectedTodo.tasks.find(task => task.id === e.target.id)
         selectedTask.completed = e.target.checked
         saveTodos()
@@ -451,8 +457,8 @@ tasksContainer.addEventListener('click', e => {
 })
 
 deleteTodoBtn.addEventListener('click', () => {
-    todos = todos.filter(todo => todo.id !== selectedTodoListId)
-    selectedTodoListId = null
+    USER_TODOS = USER_TODOS.filter(todo => todo.id !== SELECTED_TODO_LIST_ID)
+    SELECTED_TODO_LIST_ID = null
     saveAndRender()
 })
 
@@ -462,7 +468,7 @@ newTodoForm.addEventListener('submit', e => {
     if (todoName == null || todoName === '') return
     const todo = createTodo(todoName)
     newTodoInput.value = null
-    todos.push(todo)
+    USER_TODOS.push(todo)
     saveAndRender()
 })
 
@@ -472,13 +478,13 @@ newTaskForm.addEventListener('submit', e => {
     if (taskName == null || taskName === '') return
     const task = createTask(taskName)
     newTaskInput.value = null
-    const selectedTodo = todos.find(list => list.id === selectedTodoListId)
+    const selectedTodo = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
     selectedTodo.tasks.push(task)
     saveAndRender()
 })
 
 clearCompletedTasksBtn.addEventListener('click', () => {
-    const selectedTodo = todos.find(todo => todo.id === selectedTodoListId)
+    const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
     selectedTodo.tasks = selectedTodo.tasks.filter(task => !task.completed)
     saveAndRender()
 })
@@ -497,8 +503,8 @@ function saveAndRender() {
 }
 
 function saveTodos() {
-    // localStorage.setItem(LS_USERS_PREFIX, JSON.stringify(todos))
-    // localStorage.setItem(LS_TODO_SELECTED_LIST_ID_KEY, selectedTodoListId)
+    USER_OBJECT[LS_USER_TODO_LISTS] = USER_TODOS
+    USER_OBJECT[LS_USER_SELECTED_LIST_ID] = SELECTED_TODO_LIST_ID
     localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
 }
 
@@ -506,8 +512,8 @@ function renderTodos() {
     clearElement(todosContainer)
     renderTodosList()
 
-    const selectedTodoList = todos.find(list => list.id === selectedTodoListId)
-    if (selectedTodoListId == null || todos.length < 1) {
+    const selectedTodoList = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
+    if (SELECTED_TODO_LIST_ID == null || USER_TODOS.length < 1) {
         todosListDisplayContainer.style.display = 'none'
     } else {
         todosListDisplayContainer.style.display = ''
@@ -538,12 +544,12 @@ function renderTodoTasksCount(selectedTodo) {
 }
 
 function renderTodosList() {
-    todos.forEach(todo => {
+    USER_TODOS.forEach(todo => {
         const todoElement = document.createElement('li')
         todoElement.dataset.todoId = todo.id
         todoElement.classList.add('list-name')
         todoElement.innerText = todo.name
-        if (todoElement.dataset.todoId === selectedTodoListId) {
+        if (todoElement.dataset.todoId === SELECTED_TODO_LIST_ID) {
             todoElement.classList.add('active-list')
         }
         todosContainer.appendChild(todoElement)
@@ -556,51 +562,41 @@ function clearElement(elem) {
     }
 }
 
-saveAndRender()
-
-
-
-
-
-
-
-
-
+// --> SESSION LOGIG AND APP INIT
 
 function sessionChecker() {
-    // @TODO
+    
     // Check for an active session, if so redirect to the dashboard and load their todos, otherwise log the user out if there is an error
     if (SESSION !== null && SESSION.user !== undefined) {
         // Set the current user
         CURRENT_USER = SESSION.user
 
-        // Set the user object
+        // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
         USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
+        USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
+        SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
         
-        // Log the user in
+        // Log the User in
         logUserIn()
+
+        // Render User's todos
+        renderTodos()
 
         // @TODO - remove log
         console.log('A ssession was found')
     } else {
         showHomeSection()
+        // @TODO - remove log
         console.log('No session found')
     }
-
-    // Laod the user's saved todo's on active session
-    // loadUserToDos()
-}
-
-function loadUserToDos() {
-    // @TODO
 }
  
 function appInit() {
-    // @TODO
 
     // Check if there's an active session
     sessionChecker()
 
+    // @TODO - remove log
     console.log('All app scripts loaded succesfuly!')
 }
 
