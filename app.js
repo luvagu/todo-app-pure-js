@@ -1,5 +1,6 @@
 // CONSTANTS
 let CURRENT_USER = ''
+let USER_FIRST_INITIAL = ''
 let USER_OBJECT = {}
 let USER_TODOS = []
 let SELECTED_TODO_LIST_ID = null
@@ -31,12 +32,14 @@ const signUpForm = document.getElementById('signup-form')
 const logInForm = document.getElementById('login-form')
 const accountForm = document.getElementById('account-form')
 
+const userFirstInitialDisplay = document.querySelector('[data-user-name]')
 const todosContainer = document.querySelector('[data-todos]')
 const newTodoForm = document.querySelector('[data-new-todo-form]')
 const newTodoInput = document.querySelector('[data-new-todo-input]')
 const deleteTodoBtn = document.querySelector('[data-delete-todo-button]')
 const todosListDisplayContainer = document.querySelector('[data-todo-display-container]')
 const todosListTitle = document.querySelector('[data-todo-title]')
+const saveListNameBtn = document.querySelector('[data-save-list-name]')
 const todosListCounter = document.querySelector('[data-todo-count]')
 const tasksContainer = document.querySelector('[data-tasks]')
 const newTaskForm = document.querySelector('[data-new-task-form]')
@@ -106,7 +109,6 @@ accountBtnNav.addEventListener('click', (e) => {
     document.querySelector(`#account-form > #errMsg`).classList.add('hidden')
     document.querySelector(`#account-form > #successMsg`).classList.add('hidden')
 
-    // @TODO - preload the account form with the user's details
     // Get the user object and load data accordingly
     const user = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) || null
     document.querySelector('#account-form #email').value = user.email
@@ -164,13 +166,12 @@ function formsHandler(e) {
         }
     }
 
-    // @TODO
     // Validate payload & throw err accordingly
     if (!validatePayload(payload, formId)) {
-        // @TODO - Throw error message to user
+        // Throw error message to user
         errMsg.classList.remove('hidden')
         errMsg.innerText = 'Missing or invalid field(s) supplied' 
-        console.log(formId, 'Missing or invalid field(s) supplied')
+        // console.log(formId, 'Missing or invalid field(s) supplied')
         return
     }
 
@@ -202,6 +203,9 @@ function formsHandler(e) {
         USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS]
         SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID]
 
+        // Assign the user first initial
+        USER_FIRST_INITIAL = payload.firstName
+
         // Create a session
         const sessionData = {
             id: Date.now(),
@@ -212,8 +216,7 @@ function formsHandler(e) {
         // Log the user in and redirect
         logUserIn()
 
-        // TODO - remove log
-        console.log('signup-form >>>', 'All good')
+        // console.log('signup-form >>>', 'All good')
     }
 
     // Log In Form
@@ -223,6 +226,9 @@ function formsHandler(e) {
         USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
         USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
         SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
+
+        // Assign the user first initial
+        USER_FIRST_INITIAL = USER_OBJECT.firstName
 
         // Get the hashed password from the user's object or default to an empty string
         const hash = USER_OBJECT.password !== undefined ? USER_OBJECT.password : ''
@@ -240,11 +246,10 @@ function formsHandler(e) {
             // Log the user in and redirect
             logUserIn()
 
-            // TODO - remove log
-            console.log('login-form >>>', 'All good')
+            // console.log('login-form >>>', 'All good')
         } else {
-            // TODO - remove log
-            console.log('login-form >>>', 'Incorrect password or the user may not exists')
+
+            // console.log('login-form >>>', 'Incorrect password or the user may not exists')
             errMsg.classList.remove('hidden')
             errMsg.innerText = 'Incorrect email and/or password' 
             return
@@ -257,6 +262,10 @@ function formsHandler(e) {
         // Update the user accordingly
         USER_OBJECT.firstName = payload.firstName
         USER_OBJECT.lastName = payload.lastName
+
+        // Assign the user first initial and re-render if changed
+        USER_FIRST_INITIAL = payload.firstName
+        renderUserFirstInitial()
 
         // Hash the user's password if a new one was supplied (or keep it unchanged)
         if (payload.password !== '') {
@@ -273,11 +282,10 @@ function formsHandler(e) {
         // Reset the password field
         document.querySelector('#account-form #password').value = ''
 
-        // TODO - remove log
-        console.log('account-form >>>', 'All good')
+        // console.log('account-form >>>', 'All good')
     }
 
-    // @TODO - Reset SignUp and Login forms specifically
+    // Reset SignUp and Login forms specifically
     signUpForm.reset()
     logInForm.reset()
     errMsg.classList.add('hidden')
@@ -398,9 +406,17 @@ function hideAllSections() {
     sectionDashboard.classList.add('hidden')
 }
 
+function renderUserFirstInitial() {
+    // Set userFirstInitialDisplay
+    userFirstInitialDisplay.innerText = `${USER_FIRST_INITIAL.split('')[0].toUpperCase()}'s To-Do's`
+}
+
 function logUserIn() {
     loggedOutNavLinks.forEach(section => section.classList.add('hidden'))
     loggedInNavLinks.forEach(section => section.classList.remove('hidden'))
+
+    // Render user first initial display
+    renderUserFirstInitial()
 
     // Hide all sections
     hideAllSections()
@@ -439,37 +455,22 @@ function logUserOut() {
 
 // --> TODOS LOGIC
 
+newTodoForm.addEventListener('submit', e => {
+    e.preventDefault()
+    const todoName = newTodoInput.value.trim()
+    if (todoName == null || todoName === '' || USER_TODOS.some(todo => todo.name == todoName)) return
+    const todo = createTodo(todoName)
+    newTodoInput.value = null
+    USER_TODOS.push(todo)
+    SELECTED_TODO_LIST_ID = todo.id
+    saveAndRender()
+})
+
 todosContainer.addEventListener('click', e => {
     if (e.target.tagName.toLowerCase() === 'li') {
         SELECTED_TODO_LIST_ID = e.target.dataset.todoId
         saveAndRender()
     }
-})
-
-tasksContainer.addEventListener('click', e => {
-    if (e.target.tagName.toLowerCase() === 'input') {
-        const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
-        const selectedTask = selectedTodo.tasks.find(task => task.id === e.target.id)
-        selectedTask.completed = e.target.checked
-        saveTodos()
-        renderTodoTasksCount(selectedTodo)
-    }
-})
-
-deleteTodoBtn.addEventListener('click', () => {
-    USER_TODOS = USER_TODOS.filter(todo => todo.id !== SELECTED_TODO_LIST_ID)
-    SELECTED_TODO_LIST_ID = null
-    saveAndRender()
-})
-
-newTodoForm.addEventListener('submit', e => {
-    e.preventDefault()
-    const todoName = newTodoInput.value
-    if (todoName == null || todoName === '') return
-    const todo = createTodo(todoName)
-    newTodoInput.value = null
-    USER_TODOS.push(todo)
-    saveAndRender()
 })
 
 newTaskForm.addEventListener('submit', e => {
@@ -483,9 +484,49 @@ newTaskForm.addEventListener('submit', e => {
     saveAndRender()
 })
 
+tasksContainer.addEventListener('click', e => {
+    if (e.target.tagName.toLowerCase() === 'input') {
+        const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
+        const selectedTask = selectedTodo.tasks.find(task => task.id === e.target.id)
+        selectedTask.completed = e.target.checked
+        saveTodos()
+        renderTodoTasksCount(selectedTodo)
+    }
+})
+
+todosListTitle.addEventListener('click', e => {
+    saveListNameBtn.classList.remove('hidden')
+    e.target.style.backgroundColor = 'white'
+    e.target.style.padding = '0 5px'
+})
+
+todosListTitle.addEventListener('input', e => {
+    e.preventDefault()
+
+    let id = e.target.dataset.todoId
+    let name = e.target.textContent.replace('\n', '').trim()
+    if (name.length >= 1 && !USER_TODOS.some(todo => todo.name == name)) {
+        changeTodoListName(id, name)
+    }
+})
+
+saveListNameBtn.addEventListener('click', () => {
+    todosListTitle.style.backgroundColor = 'transparent'
+    todosListTitle.style.padding = '0'
+    todosListTitle.blur()
+    saveListNameBtn.classList.add('hidden')
+    saveAndRender()
+})
+
 clearCompletedTasksBtn.addEventListener('click', () => {
     const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
     selectedTodo.tasks = selectedTodo.tasks.filter(task => !task.completed)
+    saveAndRender()
+})
+
+deleteTodoBtn.addEventListener('click', () => {
+    USER_TODOS = USER_TODOS.filter(todo => todo.id !== SELECTED_TODO_LIST_ID)
+    SELECTED_TODO_LIST_ID = null
     saveAndRender()
 })
 
@@ -495,17 +536,6 @@ function createTodo(name) {
 
 function createTask(name) {
     return { id: Date.now().toString(), name: name, completed: false }
-}
-
-function saveAndRender() {
-    saveTodos()
-    renderTodos()
-}
-
-function saveTodos() {
-    USER_OBJECT[LS_USER_TODO_LISTS] = USER_TODOS
-    USER_OBJECT[LS_USER_SELECTED_LIST_ID] = SELECTED_TODO_LIST_ID
-    localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
 }
 
 function renderTodos() {
@@ -518,29 +548,12 @@ function renderTodos() {
     } else {
         todosListDisplayContainer.style.display = ''
         todosListTitle.innerText = selectedTodoList.name !== undefined ? selectedTodoList.name : ''
+        todosListTitle.setAttribute('contenteditable', 'true')
+        todosListTitle.dataset.todoId = selectedTodoList.id
         renderTodoTasksCount(selectedTodoList)
         clearElement(tasksContainer)
         renderTodoTasks(selectedTodoList)
     }
-}
-
-function renderTodoTasks(selectedTodo) {
-    selectedTodo.tasks.forEach(task => {
-        const taskElement = document.importNode(taskTemplate.content, true)
-        const checkbox = taskElement.querySelector('input')
-        checkbox.id = task.id
-        checkbox.checked = task.completed
-        const label = taskElement.querySelector('label')
-        label.htmlFor = task.id
-        label.append(task.name)
-        tasksContainer.appendChild(taskElement)
-    })
-}
-
-function renderTodoTasksCount(selectedTodo) {
-    const incompleteTasksCount = selectedTodo.tasks.filter(task => !task.completed).length
-    const taskString = incompleteTasksCount === 1 ? 'task' : 'tasks'
-    todosListCounter.innerText = `${incompleteTasksCount} ${taskString} remaining`
 }
 
 function renderTodosList() {
@@ -556,13 +569,48 @@ function renderTodosList() {
     })
 }
 
+function changeTodoListName(id, name) {
+    const selectedTodoList = USER_TODOS.find(list => list.id == id)
+    selectedTodoList.name = name
+}
+
+function renderTodoTasksCount(selectedTodo) {
+    const incompleteTasksCount = selectedTodo.tasks.filter(task => !task.completed).length
+    const taskString = incompleteTasksCount === 1 ? 'task' : 'tasks'
+    todosListCounter.innerText = `${incompleteTasksCount} ${taskString} remaining`
+}
+
+function renderTodoTasks(selectedTodo) {
+    selectedTodo.tasks.forEach(task => {
+        const taskElement = document.importNode(taskTemplate.content, true)
+        const checkbox = taskElement.querySelector('input')
+        checkbox.id = task.id
+        checkbox.checked = task.completed
+        const label = taskElement.querySelector('label')
+        label.htmlFor = task.id
+        label.append(task.name)
+        tasksContainer.appendChild(taskElement)
+    })
+}
+
 function clearElement(elem) {
     while(elem.firstChild) {
         elem.removeChild(elem.firstChild)
     }
 }
 
-// --> SESSION LOGIG AND APP INIT
+function saveTodos() {
+    USER_OBJECT[LS_USER_TODO_LISTS] = USER_TODOS
+    USER_OBJECT[LS_USER_SELECTED_LIST_ID] = SELECTED_TODO_LIST_ID
+    localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
+}
+
+function saveAndRender() {
+    saveTodos()
+    renderTodos()
+}
+
+// --> SESSION AUTO-LOGIN AND APP INIT
 
 function sessionChecker() {
     
@@ -575,6 +623,9 @@ function sessionChecker() {
         USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
         USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
         SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
+
+        // Set the user first initial
+        USER_FIRST_INITIAL = USER_OBJECT.firstName
         
         // Log the User in
         logUserIn()
@@ -582,12 +633,11 @@ function sessionChecker() {
         // Render User's todos
         renderTodos()
 
-        // @TODO - remove log
-        console.log('A ssession was found')
+        // console.log('A ssession was found')
     } else {
         showHomeSection()
-        // @TODO - remove log
-        console.log('No session found')
+
+        // console.log('No session found')
     }
 }
  
@@ -596,8 +646,7 @@ function appInit() {
     // Check if there's an active session
     sessionChecker()
 
-    // @TODO - remove log
-    console.log('All app scripts loaded succesfuly!')
+    // console.log('All app scripts loaded succesfuly!')
 }
 
 window.onload = () => {

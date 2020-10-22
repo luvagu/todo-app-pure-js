@@ -2,9 +2,9 @@
 	--clr-primary: rgb(54, 112, 199);
 	--clr-light: rgb(244, 244, 244);
 	--clr-dark: rgb(51, 51, 51);
-	--clr-warning: rgb(99, 36, 36);
+	--clr-warning: rgb(170, 7, 7);
 	--clr-linkHover: rgb(255, 140, 0);
-	--clr-error: rgb(255, 0, 0);
+	--clr-error: rgb(190, 2, 2);
 	--clr-success: rgb(4, 175, 4);
 }
 
@@ -250,7 +250,7 @@ section.dashboard {
 	align-items: flex-start;
 	padding: 3.5em 1em 5em;
 	font-weight: 300;
-  	font-size: 1.5rem;
+  	font-size: 1.4rem;
 }
 
 .todos-grid {
@@ -258,11 +258,15 @@ section.dashboard {
 	grid: 
 		'...... lists  active ......' auto/1fr 
 		minmax(100px, 300px) 
-		minmax(250px, 500px) 1fr;
+		minmax(250px, 600px) 1fr;
 }
 
 .all-tasks {
 	grid-area: lists;
+}
+
+.task-list-title {
+	color: darkorange
 }
 
 .task-list {
@@ -270,6 +274,9 @@ section.dashboard {
 	line-height: 1.7;
 	list-style: circle;
 	padding-left: 1.1em;
+	word-wrap: break-word;
+	word-break: break-all;
+	max-width: 90%;
 }
 
 .list-name {
@@ -286,7 +293,7 @@ form {
 
 .btn {
 	cursor: pointer;
-	background: 0;
+	background: none;
 	border: 0;
 	padding: 0;
 	color: inherit;
@@ -305,7 +312,7 @@ form {
 
 .btn.delete {
 	opacity: 0.7;
-	font-size: 1rem;
+	font-size: 1.1rem;
 	transition: color 200ms;
 }
 
@@ -371,6 +378,7 @@ form {
 
 .active-list {
 	font-weight: 700;
+	list-style: disc;
 }
 
 .todo-list {
@@ -391,6 +399,16 @@ form {
 
 .list-title {
 	margin: 0 1em 0 0;
+	cursor: pointer;
+	max-width: 80%;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.list-save {
+	margin: 0 1em 0 0;
+	font-size: 1.1rem;
+	cursor: pointer;
 }
 
 .task-count {
@@ -495,7 +513,7 @@ form {
 	transform-origin: left;
 }
 
-.delete-stuff {
+.clear-delete-buttons {
 	display: flex;
 	justify-content: space-evenly;
 	position: absolute;
